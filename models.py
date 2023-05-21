@@ -1,11 +1,8 @@
 import datetime
-
 from sqlalchemy import Integer, Column, create_engine, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
+from session import engine
 
-engine = create_engine(
-    "mysql+pymysql://root:prodigy1#@localhost:3306/blog"
-)
 Base = declarative_base(bind=engine)
 
 
@@ -21,5 +18,6 @@ class User(Base):
 
     def __repr__(self):
         return f'User({self.user_name})'
+
 
 Base.metadata.create_all()
