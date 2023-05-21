@@ -1,3 +1,5 @@
+from sqlalchemy.exc import IntegrityError
+
 from models import Base, User
 from session import session
 from faker import Faker
@@ -25,9 +27,14 @@ def main():
     Base.metadata.create_all()
 
     # zapis danych poprzez sesje
-    users = create_users()
-    session.add_all(users)
-    session.commit()
+    users = create_users(500)
+    for user in users:
+        try:
+            session.add(user)
+            session.commit()
+        except IntegrityError:
+            session.rollback()
+            print(f'Users: {user.user_name} already exists')
 
 
 if __name__ == "__main__":

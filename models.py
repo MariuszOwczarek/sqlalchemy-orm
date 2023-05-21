@@ -1,7 +1,7 @@
-import datetime
-from sqlalchemy import Integer, Column, create_engine, String, DateTime, Float
+from sqlalchemy import Integer, Column, String, DateTime, Float
 from sqlalchemy.ext.declarative import declarative_base
 from session import engine
+from datetime import datetime
 
 Base = declarative_base(bind=engine)
 
@@ -15,7 +15,7 @@ class User(Base):
     user_name = Column(String(50))
     salary = Column(Float, default=0)
     email = Column(String(50), unique=True, nullable=False)
-    registration_date = Column(DateTime, default=datetime.datetime.now)
+    registration_date = Column(DateTime, default=datetime.now)
 
     def __repr__(self):
         return f'User({self.user_name})'
