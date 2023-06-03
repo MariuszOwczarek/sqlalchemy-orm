@@ -28,7 +28,7 @@ class Article(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(100), unique=True, nullable=False)
-    content = Column(Text(1000), nullable=False)
+    content = Column(Text, nullable=False)
     publication_date = Column(DateTime, default=datetime.now)
     author_id = Column(Integer, ForeignKey("authors.id"))
     author = relationship("Author", back_populates='articles')
