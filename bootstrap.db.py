@@ -2,7 +2,7 @@ import random
 
 from sqlalchemy.exc import IntegrityError
 
-from models import Base, Author, Article
+from models import Base, Author, Article, Hashtags
 from session import session
 from faker import Faker
 
@@ -40,6 +40,20 @@ def create_articles(author_id, count=100):
     ]
 
 
+def create_hashtags(count=10):
+    fake = Faker()
+    hashtags = set()
+    while len(hashtags) < count:
+        hashtags.add(fake.word())
+
+    return [Hashtags(name=hashtag) for hashtag in hashtags]
+
+def assign_hashtags_to_articles(hashtags, articles):
+    for article in articles:
+        hashtag = random.choice(hashtags)
+        article.hashtags.append(hashtag)
+
+
 def main():
     # create all tables
     Base.metadata.create_all()
@@ -60,6 +74,13 @@ def main():
     session.add_all(articles)
     session.commit()
 
+    # create hashtags
+    hashtags = create_hashtags(count=100)
+    session.add_all(hashtags)
+    session.commit()
+
+    assign_hashtags_to_articles(hashtags, articles)
+    session.commit()
 
 if __name__ == "__main__":
     main()
