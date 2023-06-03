@@ -1,10 +1,10 @@
 from session import session
-from models import User
+from models import Author
 
 
 def main():
     number = 182
-    user = session.query(User).get(number)
+    user = session.query(Author).get(number)
     if user is None:
         print("User not found")
         return
@@ -13,7 +13,7 @@ def main():
     session.commit()
 
 
-    user = session.query(User).get(number)
+    user = session.query(Author).get(number)
     if user is None:
         print(f"user with id {number} deleted")
     else:
