@@ -51,7 +51,7 @@ class Article(Base):
         return f"Article({self.title})"
 
 
-class Hashtag(Base):
+class Hashtags(Base):
     __tablename__ = "hashtags"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
