@@ -1,13 +1,31 @@
 from sqlalchemy import func
-
+from models import Article, Author
 from session import session
-from models import Article
+
 
 def main():
-    result = session.query(Article.author_id, func.count()).group_by(Article.author_id)
+    authors_articles_subquery = session.query(
+        Article.author_id.label("author_id"),
+        func.count("*").label("total")
+    ).group_by(
+        Article.author_id
+    ).subquery()
 
-    for author_id, total in result:
-        print(f"Author ID: {author_id}, Total: {total}")
+    result = session.query(
+        Author.first_name,
+        Author.last_name,
+        authors_articles_subquery.c.total
+    ).join(
+        authors_articles_subquery
+    )
+
+    for record in result:
+        print(
+            record.first_name,
+            record.last_name,
+            record.total
+        )
+
 
 if __name__ == "__main__":
     main()
