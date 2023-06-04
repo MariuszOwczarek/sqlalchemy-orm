@@ -1,9 +1,10 @@
-from sqlalchemy import Integer, Column, String, DateTime, Float, Text, ForeignKey, Table
+import datetime
+
+from sqlalchemy import Column, Integer, String, DateTime, Float, Text, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 from session import engine
-from datetime import datetime
 
 Base = declarative_base(bind=engine)
 
@@ -17,43 +18,69 @@ class Author(Base):
     login = Column(String(50), unique=True, nullable=False)
     salary = Column(Float, default=0)
     email = Column(String(50), unique=True, nullable=False)
-    registration_date = Column(DateTime, default=datetime.now)
-    articles = relationship("Article", back_populates="author")
+    registration_date = Column(DateTime, default=datetime.datetime.now)
+
+    articles = relationship(
+        "Article",
+        back_populates="author",
+        cascade="all, delete, delete-orphan"
+    )
 
     def __repr__(self):
-        return f'Author({self.login})'
+        return f"Author({self.login})"
+
 
 class Article(Base):
     __tablename__ = "articles"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(100), unique=True, nullable=False)
+    title = Column(String(100), nullable=False, unique=True)
     content = Column(Text, nullable=False)
-    publication_date = Column(DateTime, default=datetime.now)
-    author_id = Column(Integer, ForeignKey("authors.id"))
-    author = relationship("Author", back_populates='articles')
-    hashtags = relationship("Hashtags", secondary="articles_hashtags",back_populates='articles')
+    publication_date = Column(DateTime, default=datetime.datetime.now)
 
-    def __str__(self):
+    author_id = Column(Integer, ForeignKey("authors.id"), nullable=False)
+
+    author = relationship("Author", back_populates="articles")
+    hashtags = relationship(
+        "Hashtag",
+        back_populates="articles",
+        secondary="articles_hashtags"
+    )
+
+    def __repr__(self):
         return f"Article({self.title})"
 
 
-class Hashtags(Base):
+class Hashtag(Base):
     __tablename__ = "hashtags"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), unique=True, nullable=False)
-    creation_date = Column(DateTime, default=datetime.now)
-    articles = relationship("Article", secondary="articles_hashtags",back_populates='hashtags')
+    name = Column(String(50), nullable=False, unique=True)
+    creation_date = Column(DateTime, default=datetime.datetime.now)
 
-    def __str__(self):
-        return f'Hashtags({self.name})'
+    articles = relationship(
+        "Article",
+        back_populates="hashtags",
+        secondary="articles_hashtags"
+    )
+
+    def __repr__(self):
+        return f"Hashtag({self.name})"
 
 
-# tworzenie tabel w inny sposob za pomoca Table a nie Class
 article_hashtag = Table(
     "articles_hashtags",
     Base.metadata,
-    Column("article_id", Integer, ForeignKey("articles.id"), primary_key=True),
-    Column("hashtag_id", Integer, ForeignKey("hashtags.id"), primary_key=True)
+    Column(
+        "article_id",
+        Integer,
+        ForeignKey("articles.id"),
+        primary_key=True
+    ),
+    Column(
+        "hashtag_id",
+        Integer,
+        ForeignKey("hashtags.id"),
+        primary_key=True
+    )
 )
